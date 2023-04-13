@@ -12,8 +12,8 @@ const obj1 = {
 
 //Shallow copy = copia bien las propiedades con un valor plano, pero hace referencia al objeto original cuando se copia una propiedad con valor de objeto.
 
-const stringifiedComplexObj = JSON.stringify(obj1);
-const obj2 = JSON.parse(stringifiedComplexObj);
+// const stringifiedComplexObj = JSON.stringify(obj1);
+// const obj2 = JSON.parse(stringifiedComplexObj);
 
 // for (prop in obj1) {
 //   obj2[prop] = obj1[prop];

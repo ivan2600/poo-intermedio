@@ -1,24 +1,103 @@
-const ivan = {
-  name: 'Iván',
-  age: 32,
-  approvedCourses: ['Curso 1'],
-  addCourse(newCourse) {
-    this.approvedCourses.push(newCourse);
-  }
-};
+function isObject(subject) {
+  return typeof subject == "objeto";
+}
 
-// console.log(Object.keys(ivan));
-// console.log(Object.getOwnPropertyNames(ivan));
-// console.log(Object.entries(ivan));
+function isArray(subject) {
+  return Array.isArray(subject);
+}
 
-// Object.defineProperty(ivan, 'terminal', {
-//   value: 'WSL',
-//   enumerable: true, // muestra o no en el listado de propiedades Object.keys()
-//   writetable: true, // define la capacidad de reescibir su valor.
-//   configurable: false, // define la capacidad de borrar esa propiedad.
-// })
+function deepCopy(subject) {
+  let copySubject;
+  
+    const subjectIsObject = isObject(subject);
+    const subjectIsArray = isArray(subject);
 
-//Object.seal(); //logra que todas las propiedades tengan el configurable en false.
-//Object.freeze(); //logra que todas las propiedades tengan el configurable y writable en false.
+    if (subjectIsArray) {
+      copySubject = [];
+    } else if (subjectIsObject) {
+      copySubject = {};
+    } else {
+      return subject;
+    }
 
-console.log(Object.getOwnPropertyDescriptors(ivan));
+    for (key in subject) {
+      const keyIsObject = isObject(subject[key]);
+
+      if (keyIsObject) {
+        copySubject[key] = deepCopy(subject[key]);
+      } else {
+        if (subjectIsArray) {
+          copySubject.push(subject[key]);
+        } else {
+          copySubject[key] = subject[key];
+        }
+      }
+    }
+
+  return copySubject;
+}
+
+// const studentBase = {
+//   name: undefined,
+//   email: undefined,
+//   age: undefined,
+//   approvedCourses: undefined,
+//   learningPaths: undefined,
+//   socialMedia: {
+//     twitter: undefined,
+//     instagram: undefined,
+//     facebook: undefined,
+//   },
+// }
+
+//const juan = deepCopy(studentBase);
+// Forma de editar una propiedad y setear que no pueda ser eliminada.
+
+// Object.defineProperty(juan, "name", {
+//   value: "Juan Carlos",
+//   configurable: false,
+// });
+
+// Forma de setear que ninguna propiedad pueda ser eliminada.
+// Object.seal(juan);
+// juan.name = "Juan Carlos";
+// isSealed() - para verificar si fué sellado.
+// isFrozen() - para verificar si fué congelado.
+
+// con esta funcion hacemos que las propiedades name y email sean obligatorias/requeridas.
+function requiredParam(param) {
+  throw new Error(param + " es obligatorio");
+}
+// Metodo RORO
+function createStudent({
+  name = requiredParam("name"),
+  email = requiredParam("email"),
+  age,
+  twitter,
+  instagram,
+  facebook,
+  approvedCourses = [],
+  learningPaths = [],
+} = {}) {
+  return {
+    name,
+    age,
+    email,
+    approvedCourses,
+    learningPaths,
+    socialMedia: {
+      twitter,
+      instagram,
+      facebook,
+    },
+  };
+}
+
+const juan = createStudent(
+  // name: "Juanito",
+  // age: 18,
+  // email: "juanito@elpasivo.com",
+  // twitter: "juanito.18",
+  // instagram: "juanito.18",
+  // facebook: "juanito.18",
+);
