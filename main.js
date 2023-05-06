@@ -79,8 +79,11 @@ function createStudent({
   approvedCourses = [],
   learningPaths = [],
 } = {}) {
-  return {
-    name,
+  const private = {
+    "_name": name,
+  };
+
+  const public = {
     age,
     email,
     approvedCourses,
@@ -90,14 +93,31 @@ function createStudent({
       instagram,
       facebook,
     },
+    readName(newName) {
+      return private._name;
+    },
+    changeName(newName) {
+      private._name = newName;
+    },
   };
+
+  Object.defineProperty(public, "readName", {
+    configurable: false,
+    writable: false,
+  });
+  Object.defineProperty(public, "changeName", {
+    configurable: false,
+    writable: false,
+  });
+
+  return public;
 }
 
-const juan = createStudent(
-  // name: "Juanito",
-  // age: 18,
-  // email: "juanito@elpasivo.com",
-  // twitter: "juanito.18",
-  // instagram: "juanito.18",
-  // facebook: "juanito.18",
-);
+const juan = createStudent({
+  name: "Juanito",
+  age: 18,
+  email: "juanito@elpasivo.com",
+  twitter: "juanito.18",
+  instagram: "juanito.18",
+  facebook: "juanito.18",
+});
