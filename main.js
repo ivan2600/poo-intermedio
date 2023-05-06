@@ -37,40 +37,57 @@ function deepCopy(subject) {
   return copySubject;
 }
 
-// const studentBase = {
-//   name: undefined,
-//   email: undefined,
-//   age: undefined,
-//   approvedCourses: undefined,
-//   learningPaths: undefined,
-//   socialMedia: {
-//     twitter: undefined,
-//     instagram: undefined,
-//     facebook: undefined,
-//   },
-// }
+function SuperObject() {}
 
-//const juan = deepCopy(studentBase);
-// Forma de editar una propiedad y setear que no pueda ser eliminada.
+SuperObject.prototype.isObject = function(subject) {
+  return typeof subject == "objeto";
+}
 
-// Object.defineProperty(juan, "name", {
-//   value: "Juan Carlos",
-//   configurable: false,
-// });
+SuperObject.prototype.deepCopy = function(subject) {
+  let copySubject;
+  
+    const subjectIsObject = isObject(subject);
+    const subjectIsArray = isArray(subject);
 
-// Forma de setear que ninguna propiedad pueda ser eliminada.
-// Object.seal(juan);
-// juan.name = "Juan Carlos";
-// isSealed() - para verificar si fué sellado.
-// isFrozen() - para verificar si fué congelado.
+    if (subjectIsArray) {
+      copySubject = [];
+    } else if (subjectIsObject) {
+      copySubject = {};
+    } else {
+      return subject;
+    }
 
-// con esta funcion hacemos que las propiedades name y email sean obligatorias/requeridas.
+    for (key in subject) {
+      const keyIsObject = isObject(subject[key]);
+
+      if (keyIsObject) {
+        copySubject[key] = deepCopy(subject[key]);
+      } else {
+        if (subjectIsArray) {
+          copySubject.push(subject[key]);
+        } else {
+          copySubject[key] = subject[key];
+        }
+      }
+    }
+
+  return copySubject;
+}
 
 function requiredParam(param) {
   throw new Error(param + " es obligatorio");
 }
-// Metodo RORO
-function createStudent({
+
+function LearningPath({
+  name = requieredParam("name"),
+  courses = [],
+}) {
+
+  this.name = name;
+  this.courses = courses;
+}
+
+function Student({
   name = requiredParam("name"),
   email = requiredParam("email"),
   age,
@@ -80,55 +97,48 @@ function createStudent({
   approvedCourses = [],
   learningPaths = [],
 } = {}) {
+  this.name = name;
+  this.email = email;
+  this.age = age;
+  this.approvedCourses = approvedCourses;
+  this.socialMedia = {
+    twitter,
+    instagram,
+    facebook,
+  };
+
   const private = {
-    "_name": name,
-  };
+    "_learningPaths": [],
+  }
 
-  const public = {
-    age,
-    email,
-    approvedCourses,
-    learningPaths,
-    socialMedia: {
-      twitter,
-      instagram,
-      facebook,
+  Object.defineProperty(this, "learningPaths", {
+    get() {
+      return private["_learningPaths"];
     },
-    get name() {
-      return private["_name"];
-    },
-    set name(newName) {
-      if (newName.length != 0) {
-        private["_name"] = newName;
+    set(newLP) {
+      if (newLP instanceof LearningPath) {
+        private["_learningPaths"].push(newLP);
       } else {
-        console.warn("Tu nombre debe tener al menos un caracter");
+        console.warn("Alguno de los LPs no es una instancia del prototipo LearningPath");
       }
-    }
-    // readName(newName) {
-    //   return private._name;
-    // },
-    // changeName(newName) {
-    //   private._name = newName;
-    // },
-  };
-
-  // Object.defineProperty(public, "readName", {
-  //   configurable: false,
-  //   writable: false,
-  // });
-  // Object.defineProperty(public, "changeName", {
-  //   configurable: false,
-  //   writable: false,
-  // });
-
-  return public;
+    },
+  });
+  for (learningPathIndex in learningPaths) {
+    this.learningPaths = learningPaths[learningPathIndex];
+  }
 }
 
-const juan = createStudent({
+const escuelaWeb = new LearningPath({ name: "Escuela de Desarrollo Web"});
+const escuelaData = new LearningPath({ name: "Escuela de Data Science"});
+
+const juan = new Student({
   name: "Juanito",
   age: 18,
   email: "juanito@elpasivo.com",
+  learningPaths: [escuelaWeb, escuelaData],
   twitter: "juanito.18",
   instagram: "juanito.18",
   facebook: "juanito.18",
 });
+
+
